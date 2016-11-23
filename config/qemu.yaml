@@ -45,7 +45,7 @@ provisioners:
       scripts:
       - scripts/base.sh
       - scripts/vagrant.sh
-      - scripts/virtualbox.sh
+      - scripts/qemu.sh
       - scripts/cleanup.sh
   type: shell
 variables:
