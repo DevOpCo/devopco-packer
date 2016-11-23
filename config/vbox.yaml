@@ -1,0 +1,70 @@
+---
+builders:
+- boot_command:
+  - "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+  boot_wait: 10s
+  disk_size: "{{user `disk_size`}}"
+  guest_additions_path: VBoxGuestAdditions_{{.Version}}.iso
+  guest_os_type: "{{user `guest_os_type`}}"
+  headless: true
+  http_directory: http
+  iso_checksum: "{{user `iso_checksum`}}"
+  iso_checksum_type: "{{user `iso_checksum_type`}}"
+  iso_url: "{{user `iso_url`}}"
+  shutdown_command: echo '/sbin/halt -h -p' > /tmp/shutdown.sh; echo 'vagrant'|sudo
+    -S sh '/tmp/shutdown.sh'
+  ssh_password: "{{user `ssh_password`}}"
+  ssh_port: 22
+  ssh_username: "{{user `ssh_username`}}"
+  ssh_wait_timeout: 10000s
+  type: virtualbox-iso
+  vboxmanage:
+  - - modifyvm
+    - "{{.Name}}"
+    - "--memory"
+    - "{{user `mem_size`}}"
+  - - modifyvm
+    - "{{.Name}}"
+    - "--cpus"
+    - "{{user `numvcpus`}}"
+  virtualbox_version_file: ".vbox_version"
+post-processors:
+- - keep_input_artifact: false
+    override:
+      virtualbox:
+        output: "{{user `vm_name`}}-virtualbox.box"
+    type: vagrant
+  - artifact: "{{user `atlas_username`}}/{{user `atlas_name`}}"
+    artifact_type: vagrant.box
+    token: "{{user `atlas_token`}}"
+    metadata:
+      provider: virtualbox
+      version: "{{user `version`}}"
+    only:
+    - virtualbox-iso
+    type: atlas
+provisioners:
+- execute_command: echo 'vagrant'|sudo -S sh '{{.Path}}'
+  override:
+    virtualbox-iso:
+      scripts:
+      - scripts/base.sh
+      - scripts/vagrant.sh
+      - scripts/virtualbox.sh
+      - scripts/cleanup.sh
+  type: shell
+variables:
+  atlas_name: "{{env `ATLAS_NAME`}}"
+  atlas_username: "{{env `ATLAS_USERNAME`}}"
+  token: "{{env `ATLAS_TOKEN`}}"
+  disk_size: "{{env `DISK_SIZE`}}"
+  guest_os_type: "{{env `GUEST_OS_TYPE`}}"
+  iso_checksum: "{{env `ISO_CHECKSUM`}}"
+  iso_checksum_type: "{{env `ISO_CHECKSUM_TYPE`}}"
+  iso_url: "{{env `ISO_URL`}}"
+  mem_size: "{{env `MEM_SIZE`}}"
+  numvcpus: "{{env `NUMVCPUS`}}"
+  ssh_password: "{{env `SSH_PASSWORD`}}"
+  ssh_username: "{{env `SSH_USERNAME`}}"
+  version: "{{env `VMVERSION`}}"
+  vm_name: "{{env `VM_NAME`}}"

@@ -1,0 +1,62 @@
+---
+builders:
+- boot_command:
+  - "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+  boot_wait: 10s
+  disk_size: "{{user `disk_size`}}"
+  guest_os_type: redhat
+  headless: true
+  http_directory: http
+  iso_checksum: "{{user `iso_checksum`}}"
+  iso_checksum_type: "{{user `iso_checksum_type`}}"
+  iso_url: "{{user `iso_url`}}"
+  shutdown_command: echo '/sbin/halt -h -p' > /tmp/shutdown.sh; echo 'vagrant'|sudo
+    -S sh '/tmp/shutdown.sh'
+  ssh_password: "{{user `ssh_password`}}"
+  ssh_port: 22
+  ssh_username: "{{user `ssh_username`}}"
+  ssh_wait_timeout: 10000s
+  tools_upload_flavor: linux
+  type: vmware-iso
+  vmx_data:
+    cpuid.coresPerSocket: '1'
+    memsize: "{{user `mem_size`}}"
+    numvcpus: "{{user `numvcpus`}}"
+post-processors:
+- - keep_input_artifact: false
+    override:
+      vmware:
+        output: "{{user `vm_name`}}-vmware.box"
+    type: vagrant
+  - artifact: "{{user `atlas_username`}}/{{user `atlas_name`}}"
+    artifact_type: vagrant.box
+    metadata:
+      provider: vmware_desktop
+      version: "{{user `version`}}"
+    only:
+    - vmware-iso
+    type: atlas
+provisioners:
+- execute_command: echo 'vagrant'|sudo -S sh '{{.Path}}'
+  override:
+    vmware-iso:
+      scripts:
+      - scripts/base.sh
+      - scripts/vagrant.sh
+      - scripts/vmware.sh
+      - scripts/cleanup.sh
+  type: shell
+variables:
+  atlas_name: "{{env `ATLAS_NAME`}}"
+  atlas_username: "{{env `ATLAS_USERNAME`}}"
+  disk_size: "{{env `DISK_SIZE`}}"
+  guest_os_type: "{{env `GUEST_OS_TYPE`}}"
+  iso_checksum: "{{env `ISO_CHECKSUM`}}"
+  iso_checksum_type: "{{env `ISO_CHECKSUM_TYPE`}}"
+  iso_url: "{{env `ISO_URL`}}"
+  mem_size: "{{env `MEM_SIZE`}}"
+  numvcpus: "{{env `NUMVCPUS`}}"
+  ssh_password: "{{env `SSH_PASSWORD`}}"
+  ssh_username: "{{env `SSH_USERNAME`}}"
+  version: "{{env `VMVERSION`}}"
+  vm_name: "{{env `VM_NAME`}}"
