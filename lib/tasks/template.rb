@@ -1,24 +1,30 @@
 module Template
   def self.included(base)
     base.class_eval do
-      desc "template {argument} [options]", "template command"
-      option :opt1, :required => true, :aliases => "-c"
-      option :opt2, :required => true, :aliases => "-e"
-      option :opt3, :required => true, :aliases => "-v"
+      desc "template [options]", "template command"
+      option :distro, :required => true, :type => :string, :aliases => "-d"
+      option :version, :required => true, :type => :string, :aliases => "-v"
+      option :provider, :type => :string, :aliases => "-p"
       long_desc <<-LONGDESC
-        Use this module to generate any new commands
-        By copying, replacing the names, and adding
-        Into the PlatImp.rb file in the include section
-
-        Removing the `:required => true,` from the option
-        Will allow for logic that is not as granular
-        When looking for details in a larger scope
+      Builds the packer image depending on options, defaults to virtualbox build
       LONGDESC
-      def template(argument)
-        puts argument
-        puts "this is an example/template for thor tasks"
-        puts 'To access options use #{options[:option_name]}'
-        puts "e.g. If called correctly, you've put --opt1= or -a #{options[:opt1] || 'opt1 not called'} --opt2 or -e #{options[:opt2] || 'opt2 not called'} --opt3= or -v #{options[:opt3] || 'opt3 not called'}"
+      def template
+        # puts ARGV.join(" ")
+        # Load all variables from yaml into environment (except token, should be
+        # set in .profile or by other means)
+        build_variables=YAML::load(File.read("config/variables.yaml"))
+
+        # Set variables in the environment
+        build_variables.each do |k,v|
+          puts ENV[k.upcase]=v
+        end
+
+        template_json=File.open( "build/template.json","w" )
+        template_json<<JSON.pretty_generate(YAML.load(File.read("config/#{( options[:provider]=='virtualbox' ? ARGV.join(" ") : 'vbox'  )}.yaml")))
+        template_json.close
+
+        # Build the project
+        puts exec("packer build build/template.json")
       end
     end
   end
