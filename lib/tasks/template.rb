@@ -9,7 +9,6 @@ module Template
       Builds the packer image depending on options, defaults to virtualbox build
       LONGDESC
       def template
-        # puts ARGV.join(" ")
         # Load all variables from yaml into environment (except token, should be
         # set in .profile or by other means)
         build_variables=YAML::load(File.read("config/variables.yaml"))
