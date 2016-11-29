@@ -18,9 +18,8 @@ module Template
         build_variables.each do |k,v|
           puts ENV[k.upcase]=v
         end
-
         template_json=File.open( "build/template.json","w" )
-        template_json<<JSON.pretty_generate(YAML.load(File.read("config/#{( options[:provider]=='virtualbox' ? ARGV.join(" ") : 'vbox'  )}.yaml")))
+        template_json<<JSON.pretty_generate(YAML.load(File.read("config/#{( options[:provider]=='virtualbox' ?  'vbox' : options[:provider] )}.yaml")))
         template_json.close
 
         # Build the project
