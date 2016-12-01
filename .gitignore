@@ -1,5 +1,6 @@
 #ignore build artifacts
 build/*
+packer_cache/
 
 #keep the directory
 !build/.gitkeep
