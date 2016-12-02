@@ -21,13 +21,13 @@ builders:
     role: packer-creator
   type: amazon-ebs
   vpc_id: "{{user `vpc`}}"
-post-processors: 
+post-processors:
 provisioners:
 - execute_command: sudo {{.Vars}} sh {{.Path}}
   scripts:
-  - scripts/update.sh
-  - scripts/install.sh
-  - scripts/cleanup.sh
+  - build/update.sh
+  - build/install.sh
+  - build/cleanup.sh
   type: shell
 variables:
   ami_name: centos6.6-cloud-init

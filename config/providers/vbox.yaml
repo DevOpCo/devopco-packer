@@ -48,10 +48,9 @@ provisioners:
   override:
     virtualbox-iso:
       scripts:
-      - scripts/base.sh
-      - scripts/vagrant.sh
-      - scripts/virtualbox.sh
-      - scripts/cleanup.sh
+      - build/update.sh
+      - build/install.sh
+      - build/cleanup.sh
   type: shell
 variables:
   atlas_name: "{{env `ATLAS_NAME`}}"

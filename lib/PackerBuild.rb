@@ -13,5 +13,7 @@ class CLI < Thor
   #   :opt2, {:type => :string, :required => true},
   #   :opt3, {:type => :string, :required => true},
   # ]
+  include Helpers
   include Template
+  include Cleanup
 end

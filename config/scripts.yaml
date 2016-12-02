@@ -1,0 +1,77 @@
+---
+# distro_name:
+#   distro_version:
+#     builder_name:
+#       scripts:
+#         update:
+#         install:
+#         cleanup:
+centos_6:
+  vbox: &default
+    update: |
+      # Install Update:
+      yum -y update
+    install: |
+      # Install cloud-init
+      yum -y localinstall http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+      yum -y install cloud-init
+      sed -i 's/disable_root.*/disable_root: 0/' /etc/cloud/cloud.cfg
+      sed -i 's/^.*requiretty/#Defaults requiretty/' /etc/sudoers
+    cleanup: |
+      # Cleanup
+      sed -i '/HWADDR/d' /etc/sysconfig/network-scripts/ifcfg-eth0
+      sed -i "/^UUID/d" /etc/sysconfig/network-scripts/ifcfg-eth0
+
+      # SELinux set to Permissive
+      rm /etc/sysconfig/selinux
+      ln -s /etc/selinux/config /etc/sysconfig/selinux
+      sed -i "s/^\(SELINUX=\).*/\1permissive/g" /etc/selinux/config
+
+      # Set Timezone
+      echo 'ZONE="America/New_York"' > /etc/sysconfig/clock
+
+      # Turn off iptables
+      service iptables save
+      service iptables stop
+      chkconfig iptables off
+
+      rm -f /etc/ssh/ssh_host_*
+      rm -f /etc/udev/rules.d/70-persistent-net.rules
+      rm -f /var/lib/dhclient/dhclient-eth0.leases
+      rm -rf /tmp/*
+      yum -y clean all
+distro:
+  - ubuntu:
+    commands:
+      -
+  - centos:
+    commands:
+      all:
+        -
+      aws:
+        -
+        - |
+          # Install cloudformation init
+          cd /opt && \
+              curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz && \
+              tar -xvpf aws-cfn-bootstrap-latest.tar.gz
+          cd /opt/aws-cfn-bootstrap-1.4/ && \
+              python setup.py build && \
+              python setup.py install
+        - |
+          # Configure cloudformation init
+          ln -s /usr/init/redhat/cfn-hup /etc/init.d/cfn-hup
+          chmod 775 /usr/init/redhat/cfn-hup
+          mkdir -p /opt/aws/bin
+          ln -s /usr/bin/cfn-hup /opt/aws/bin/cfn-hup
+          ln -s /usr/bin/cfn-init /opt/aws/bin/cfn-init
+          ln -s /usr/bin/cfn-signal /opt/aws/bin/cfn-signal
+        -
+      vbox:
+        - |
+
+        - |
+        - |
+  - other:
+    commands:
+      -

@@ -1,0 +1,3 @@
+# This file will contain a list of AWS ami's to build against - preferably minimal default builds to allow for maximum configurability
+# Proposed structure below:
+distro_name: ami_name
