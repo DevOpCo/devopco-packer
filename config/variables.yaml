@@ -14,9 +14,4 @@ vm_name: "centos-7-2-min"
 # AWS Specific:
 ami_name: "centos6.6-cloud-init"
 image_id: "ami-c2a818aa"
-description: "Base image for creating new AMIs"
-# aws_access_key: "{{env `AWS_ACCESS_KEY_ID`}}"
-# aws_secret_key: "{{env `AWS_SECRET_ACCESS_KEY`}}"
-# sec_grp_id: "{{env `PACKER_SG`}}"
-# subnet: "{{env `PACKER_SN`}}"
-# vpc: "{{env `PACKER_VPC`}}"
+description: "Base image for creating new AMIs" # Could be generated based on version for more description

@@ -33,7 +33,7 @@ variables:
   ami_name: centos6.6-cloud-init
   aws_access_key: "{{env `AWS_ACCESS_KEY_ID`}}"
   aws_secret_key: "{{env `AWS_SECRET_ACCESS_KEY`}}"
-  description: Base image for creating new AMIs
+  description: "{{env `DESCRIPTION`}}"
   image_id: ami-c2a818aa
   sec_grp_id: "{{env `PACKER_SG`}}"
   subnet: "{{env `PACKER_SN`}}"
