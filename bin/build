@@ -9,6 +9,8 @@ $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require "PackerBuild"
 
-puts "I was called with #{ARGV.size} arguments: #{ARGV.join(', ')}." #For Debugging until RC is ready for PR
+if ENV['DEBUG']
+  puts "I was called with #{ARGV.size} arguments: #{ARGV.join(', ')}."
+end
 
 CLI.start(ARGV)
